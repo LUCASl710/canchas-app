@@ -210,6 +210,8 @@ Si falla la conexión a la base, revisá los logs de Render. Si el error es de c
 
 El seed crea `admin@canchas.com / Admin1234`. **No lo dejes así en un sitio público.**
 
+> En este deploy ya está cambiada; la contraseña quedó fuera del repositorio.
+
 Desde `Backend/`, con `Backend/.env.production` apuntando a TiDB:
 
 ```powershell
