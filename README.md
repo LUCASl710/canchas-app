@@ -98,7 +98,7 @@ Corre dos suites:
 
 - **Concurrencia** (`test/concurrencia.js`): dispara dos reservas simultáneas
   al mismo turno. El resultado correcto es una `201` y una `409`.
-- **API** (`test/api.test.js`): 17 tests de integración contra HTTP real
+- **API** (`test/api.test.js`): 23 tests de integración contra HTTP real
   (permisos, validaciones, doble reserva, cambios de estado, 404 y JSON
   malformado).
 
@@ -158,8 +158,8 @@ También se pueden correr por separado con `npm run test:concurrencia` y
 > ⚠️ **Mercado Pago:** el `MP_ACCESS_TOKEN` anterior quedó expuesto en texto plano.
 > Fue eliminado del `.env`. Hay que generar uno nuevo desde el panel de
 > desarrolladores de Mercado Pago antes de volver a usar Checkout Pro.
-> En la demo pública Checkout Pro está desactivado: usá **efectivo** o
-> **QR presencial** para reservar.
+> En la demo pública la UI reserva con **efectivo**; Checkout Pro queda
+> desactivado hasta rotar el token.
 
 ## Decisiones de producto
 
