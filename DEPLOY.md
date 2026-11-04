@@ -81,9 +81,30 @@ DB_NAME=canchas_db
 DB_SSL=true
 ```
 
+### Networking
+
+En TiDB Cloud → tu cluster → **Networking**, habilitá **Public Endpoint**.
+Render free no tiene IP fija de salida, así que se permite `0.0.0.0/0`. La
+protección real es la contraseña fuerte + SSL. Si querés cerrarlo, permití solo
+los rangos de salida de Render (`74.220.48.0/24` y `74.220.56.0/24`) y agregá
+tu IP para correr scripts locales.
+
 ### Crear las tablas y los datos demo
 
-Desde la raíz del repo, con el cliente MySQL de Laragon:
+#### Opción recomendada: script `db:import`
+
+```powershell
+cd Backend
+$env:DOTENV_CONFIG_PATH = ".env.production"
+$env:CONFIRMAR_RESET = "SI"
+npm run db:import
+```
+
+> `CONFIRMAR_RESET=SI` es obligatorio porque el script **borra y recrea** las
+> tablas. Usalo solo en la primera puesta en marcha o cuando quieras volver a
+> los datos demo. Lee `db/schema.sql` + `db/seed.sql` y maneja el SSL de TiDB.
+
+#### Alternativa manual (cliente MySQL de Laragon)
 
 ```powershell
 $mysql = "C:\laragon\bin\mysql\mysql-8.4.3-winx64\bin\mysql.exe"
@@ -199,7 +220,9 @@ npm run crear-admin
 ```
 
 El script crea el admin si no existe o actualiza la contraseña si ya existe.
-Después podés borrar el usuario demo `admin@canchas.com` desde el panel o con SQL.
+La contraseña de producción no se guarda en el repo: guardala en un gestor de
+contraseñas. Si querés otro email de admin, cambiá `ADMIN_EMAIL` y volvé a correr
+el script.
 
 ---
 
@@ -219,6 +242,10 @@ Alternativa con cron-job.org:
 
 > GitHub Actions puede demorar unos minutos en horarios pico. Si necesitás
 > puntualidad exacta, usá cron-job.org.
+>
+> GitHub también desactiva los workflows programados después de 60 días sin
+> actividad en el repo. Si no vas a hacer push por un tiempo, usá cron-job.org
+> o reactivá el workflow desde la pestaña **Actions**.
 
 ---
 
