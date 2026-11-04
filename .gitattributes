@@ -1,0 +1,15 @@
+# Normaliza los fines de línea para que el repo no genere diffs falsos
+# entre Windows, Linux y macOS.
+* text=auto eol=lf
+
+# Binarios
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.mp4 binary
+*.webm binary
+*.woff binary
+*.woff2 binary
