@@ -54,7 +54,14 @@ async function main() {
     login('cliente@test.com', 'Cliente1234'),
   ]);
 
-  const body = { cancha_id: 1, franja_id: 1, fecha: '2026-12-30', metodo_pago: 'efectivo' };
+  const fecha = new Date();
+  fecha.setDate(fecha.getDate() + 30);
+  const body = {
+    cancha_id: 1,
+    franja_id: 1,
+    fecha: fecha.toISOString().slice(0, 10),
+    metodo_pago: 'efectivo',
+  };
 
   // Las dos salen exactamente al mismo tiempo.
   const resultados = await Promise.all([

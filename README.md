@@ -1,5 +1,7 @@
 # ⚽ Canchas App
 
+[![CI](https://github.com/LUCASl710/canchas-app/actions/workflows/ci.yml/badge.svg)](https://github.com/LUCASl710/canchas-app/actions/workflows/ci.yml)
+
 Sistema de gestión y reserva de turnos para complejos de canchas de fútbol.
 Incluye un panel de administración para el complejo y una vista pública para los clientes.
 
@@ -11,6 +13,8 @@ Incluye un panel de administración para el complejo y una vista pública para l
 
 > El backend corre en Render free: si estuvo 15 minutos sin tráfico, el primer
 > request puede tardar ~1 minuto en despertar.
+
+![Captura de Canchas App](docs/canchas-app.png)
 
 ## Stack
 
@@ -104,6 +108,10 @@ Corre dos suites:
 
 También se pueden correr por separado con `npm run test:concurrencia` y
 `npm run test:api`. Los tests limpian las reservas que crean.
+
+En cada push a `main` que toque `Backend/` o `db/`, GitHub Actions levanta un
+MySQL 8.4, importa el schema y el seed, y corre `npm test`
+([`.github/workflows/ci.yml`](.github/workflows/ci.yml)).
 
 ## Usuarios de prueba
 
@@ -205,3 +213,7 @@ También se pueden correr por separado con `npm run test:concurrencia` y
 
 El paso a paso para publicarlo gratis (Render + TiDB Cloud + Vercel) está en
 [`DEPLOY.md`](DEPLOY.md).
+
+## Licencia
+
+[MIT](LICENSE)

@@ -1,0 +1,99 @@
+name: CI
+
+# Corre los tests del backend contra un MySQL real en cada push que toque
+# Backend/, db/ o este workflow. También corre en los pull requests.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Backend/**'
+      - 'db/**'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: canchas_db
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+
+    env:
+      NODE_ENV: test
+      PORT: 3001
+      HOST: 127.0.0.1
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: canchas_db
+      DB_SSL: false
+      JWT_SECRET: test-secret-ci
+      FRONTEND_URL: http://localhost:5173
+      # Los tests hacen varios logins; subimos el límite para no chocar.
+      AUTH_RATE_LIMIT_MAX: 1000
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: Backend/package-lock.json
+
+      - name: Instalar dependencias
+        working-directory: Backend
+        run: npm ci
+
+      - name: Importar schema y seed
+        run: |
+          docker exec -i ${{ job.services.mysql.id }} mysql -uroot -proot < db/schema.sql
+          docker exec -i ${{ job.services.mysql.id }} mysql -uroot -proot canchas_db < db/seed.sql
+
+      - name: Correr tests
+        working-directory: Backend
+        run: |
+          node index.js > /tmp/backend.log 2>&1 &
+          BACKEND_PID=$!
+
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:3001/api/health > /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+
+          if ! curl -fsS http://127.0.0.1:3001/api/health > /dev/null; then
+            echo "El backend no arrancó"
+            cat /tmp/backend.log
+            kill $BACKEND_PID || true
+            exit 1
+          fi
+
+          npm test
+          TEST_EXIT=$?
+          kill $BACKEND_PID || true
+
+          if [ $TEST_EXIT -ne 0 ]; then
+            echo "--- Logs del backend ---"
+            cat /tmp/backend.log
+          fi
+
+          exit $TEST_EXIT

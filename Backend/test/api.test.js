@@ -13,8 +13,16 @@ require('dotenv').config();
 
 const HOST = process.env.HOST || 'localhost';
 const PORT = Number(process.env.PORT) || 3001;
-const FECHA = '2027-06-15';
-const FECHA2 = '2027-06-16';
+
+// Fechas dinámicas para que los tests no venzan con el paso del tiempo.
+function fechaFutura(dias) {
+  const d = new Date();
+  d.setDate(d.getDate() + dias);
+  return d.toISOString().slice(0, 10);
+}
+
+const FECHA = fechaFutura(60);
+const FECHA2 = fechaFutura(61);
 
 let adminToken = '';
 let clienteToken = '';
