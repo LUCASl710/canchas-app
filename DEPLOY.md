@@ -14,6 +14,20 @@ Stack elegido para que el proyecto quede online **sin pagar**:
 > - TiDB Starter tiene una cuota mensual de storage y request units. Alcanza de sobra para un portfolio.
 > - Render free da 750 horas/mes. Si lo mantenés despierto 24/7 son ~730, así que entra justo.
 
+## Deploy actual (noviembre 2026)
+
+| Pieza | URL / recurso |
+|---|---|
+| Frontend | <https://canchas-app-mu.vercel.app> |
+| Backend | <https://canchas-api-2m2q.onrender.com> |
+| Health check | <https://canchas-api-2m2q.onrender.com/api/health> |
+| Base de datos | TiDB Cloud Starter, cluster `canchas-db`, AWS us-west-2 |
+| Render | servicio `canchas-api` (`srv-dblcc0ijnfac73fjb8rg`) |
+| Vercel | proyecto `lucasl710s-projects/canchas-app`, root `Frontend` |
+
+El frontend y el backend están conectados al repo `LUCASl710/canchas-app`:
+cada push a `main` redeploya en Vercel y Render.
+
 ---
 
 ## 0. Requisitos
@@ -108,12 +122,12 @@ Comprobación rápida:
 3. Render lee `render.yaml` y crea el servicio `canchas-api` (plan free, root `Backend`).
 4. Completá los secretos que pide:
    - `DB_HOST`, `DB_USER`, `DB_PASSWORD`: los de TiDB.
-   - `FRONTEND_URL`: por ahora `http://localhost:5173` (lo cambiamos en el paso 5).
+   - `FRONTEND_URL`: `https://canchas-app-mu.vercel.app` (la URL de Vercel; se puede actualizar después).
 5. **Apply** y esperá el deploy.
 6. Probá:
 
 ```powershell
-curl.exe https://canchas-api.onrender.com/api/health
+curl.exe https://canchas-api-2m2q.onrender.com/api/health
 # {"ok":true}
 ```
 
@@ -130,16 +144,17 @@ Si falla la conexión a la base, revisá los logs de Render. Si el error es de c
 2. Configuración:
    - **Root Directory**: `Frontend`
    - **Framework Preset**: Vite
-   - **Environment Variable**: `VITE_API_URL=https://canchas-api.onrender.com`
+   - **Environment Variable**: `VITE_API_URL=https://canchas-api-2m2q.onrender.com`
 3. **Deploy**.
-4. Anotá la URL de producción (ej. `https://canchas-app.vercel.app`).
+4. La URL de producción actual es <https://canchas-app-mu.vercel.app>.
+   El proyecto ya está conectado al repo de GitHub, así que cada push a `main` redeploya.
 
 ---
 
 ## 5. Conectar frontend y backend (CORS)
 
 1. En Render → servicio `canchas-api` → **Environment**.
-2. Editá `FRONTEND_URL` y poné la URL de Vercel (sin barra final).
+2. Editá `FRONTEND_URL` y poné `https://canchas-app-mu.vercel.app` (sin barra final).
 3. Guardá y redeployá.
 4. Entrá a la URL de Vercel y probá login/registro/reserva.
 
@@ -169,7 +184,7 @@ Render free duerme a los 15 minutos. Para que un visitante no espere ~1 minuto:
 
 1. Creá una cuenta gratis en <https://cron-job.org>.
 2. Creá un cron job cada 10 minutos apuntando a:
-   `https://canchas-api.onrender.com/api/health`
+   `https://canchas-api-2m2q.onrender.com/api/health`
 3. Listo. Consume ~730 de las 750 horas free mensuales.
 
 ---
@@ -179,7 +194,7 @@ Render free duerme a los 15 minutos. Para que un visitante no espere ~1 minuto:
 1. Rotá el token en el panel de Mercado Pago (el anterior estuvo expuesto).
 2. En Render → Environment agregá:
    - `MP_ACCESS_TOKEN=APP_USR-...`
-   - `MP_WEBHOOK_URL=https://canchas-api.onrender.com/api/pagos/webhook`
+   - `MP_WEBHOOK_URL=https://canchas-api-2m2q.onrender.com/api/pagos/webhook`
 3. Redeploy.
 4. En Mercado Pago, configurá la URL de notificación si la consola lo pide.
 
@@ -187,7 +202,7 @@ Render free duerme a los 15 minutos. Para que un visitante no espere ~1 minuto:
 
 ## Checklist final
 
-- [ ] `https://canchas-api.onrender.com/api/health` devuelve `{"ok":true}`.
+- [ ] `https://canchas-api-2m2q.onrender.com/api/health` devuelve `{"ok":true}`.
 - [ ] El frontend carga canchas y franjas.
 - [ ] Login de cliente y admin funciona.
 - [ ] Se puede reservar y el turno queda ocupado.
