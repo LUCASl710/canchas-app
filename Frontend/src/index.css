@@ -1,0 +1,42 @@
+:root {
+  /* Colores principales */
+  --color-verde-oscuro: #1a5c2a;
+  --color-verde-claro: #4ade80;
+  --color-verde-fondo: #d1fae5;
+  --color-verde-texto: #065f46;
+
+  /* Neutros */
+  --color-blanco: #ffffff;
+  --color-texto: #1f2937;
+  --color-texto-secundario: #6b7280;
+  --color-borde: #e5e7eb;
+  --color-fondo: #f9fafb;
+
+  /* Tipografía */
+  --font-principal: 'Inter', system-ui, sans-serif;
+
+  /* Espaciado */
+  --radio-borde: 10px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-principal);
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+  line-height: 1.5;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input, select {
+  font-family: inherit;
+}

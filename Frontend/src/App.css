@@ -1,0 +1,73 @@
+.app-container {
+  min-height: 100vh;
+}
+
+.app-header {
+  background: var(--color-verde-oscuro);
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.app-logo {
+  color: var(--color-blanco);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.app-nav {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.app-nav-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-blanco);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: var(--radio-borde);
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.app-nav-btn.activo {
+  background: var(--color-verde-claro);
+  color: var(--color-verde-oscuro);
+  border-color: var(--color-verde-claro);
+}
+
+.app-nav-btn-salir {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  border: none;
+  font-size: 13px;
+}
+
+.app-content {
+  padding: 2rem 1.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.app-usuario {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.app-rol {
+  background: var(--color-verde-claro);
+  color: var(--color-verde-oscuro);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}

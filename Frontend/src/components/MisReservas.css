@@ -1,0 +1,202 @@
+.reservas-titulo {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+}
+
+.reservas-vacio {
+  color: var(--color-texto-secundario);
+  font-size: 14px;
+}
+
+.reservas-filtro {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 1rem;
+}
+
+.reservas-filtro-label {
+  font-size: 13px;
+  color: var(--color-texto-secundario);
+}
+
+.reservas-filtro-input {
+  padding: 8px 10px;
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.reservas-filtro-btn {
+  background: none;
+  border: 1px solid var(--color-borde);
+  color: var(--color-texto);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.reserva-card {
+  background: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: 14px;
+  padding: 1.25rem;
+  margin-bottom: 12px;
+}
+
+.reserva-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.reserva-card-cancha {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.reserva-estado {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: capitalize;
+}
+
+.reserva-estado.confirmada {
+  background: var(--color-verde-fondo);
+  color: var(--color-verde-texto);
+}
+
+.reserva-estado.pendiente {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.reserva-estado.cancelada {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.reserva-estado.completada {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.reserva-detalle {
+  font-size: 13px;
+  color: var(--color-texto-secundario);
+  margin-bottom: 3px;
+}
+
+.reserva-acciones {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.reserva-btn-cancelar {
+  background: none;
+  border: 1px solid #dc2626;
+  color: #dc2626;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.reserva-btn-confirmar,
+.reserva-btn-completar {
+  border: none;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.reserva-btn-confirmar {
+  background: var(--color-verde-claro);
+  color: var(--color-verde-texto);
+}
+
+.reserva-btn-completar {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.reserva-acciones .reserva-btn-grabacion {
+  margin-top: 0;
+  margin-left: 0;
+}
+
+.reservas-mensaje {
+  margin-top: 1rem;
+  padding: 10px 14px;
+  background: var(--color-verde-fondo);
+  color: var(--color-verde-texto);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.reserva-btn-grabacion {
+  background: var(--color-verde-claro);
+  color: var(--color-verde-texto);
+  border: none;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 10px;
+  margin-left: 8px;
+}
+
+.grabacion-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 100;
+}
+
+.grabacion-modal-contenido {
+  background: var(--color-blanco);
+  border-radius: 14px;
+  padding: 1.5rem;
+  max-width: 640px;
+  width: 100%;
+}
+
+.grabacion-titulo {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.grabacion-video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: none;
+  border-radius: 10px;
+}
+
+.grabacion-cerrar {
+  background: var(--color-verde-oscuro);
+  color: var(--color-blanco);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 14px;
+}
