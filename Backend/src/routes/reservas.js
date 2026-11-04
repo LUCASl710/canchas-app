@@ -6,6 +6,7 @@ const authMiddleware = require('../middleware/auth');
 const { soloAdmin } = require('../middleware/roles');
 const { Preference } = require('mercadopago');
 const mp = require('../config/mercadopago');
+const { calcularMonto } = require('../utils/precios');
 
 // GET /api/reservas
 // Admin: ve todas las reservas. Cliente: ve SOLO las suyas.
@@ -82,7 +83,7 @@ router.post('/', authMiddleware, async (req, res) => {
 
     // 1. LOCK de la franja. Debe ser lo PRIMERO dentro de la transacción.
     const [franjas] = await conn.query(
-      'SELECT id, precio_base FROM franjas_horarias WHERE id = ? AND cancha_id = ? FOR UPDATE',
+      'SELECT id, hora_inicio, precio_base, precio_nocturno FROM franjas_horarias WHERE id = ? AND cancha_id = ? FOR UPDATE',
       [franja_id, cancha_id]
     );
 
@@ -110,7 +111,8 @@ router.post('/', authMiddleware, async (req, res) => {
     }
 
     // 4. Insertar. El precio sale de la base, no del cliente.
-    const monto_total = franjas[0].precio_base;
+    //    Si la franja es nocturna y tiene precio nocturno, se cobra ese.
+    const monto_total = calcularMonto(franjas[0]);
     const estadoInicial = metodo_pago === 'mercadopago' ? 'pendiente' : 'confirmada';
 
     const [resultado] = await conn.query(

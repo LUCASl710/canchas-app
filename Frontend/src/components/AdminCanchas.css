@@ -47,6 +47,14 @@
   margin-top: 6px;
 }
 
+.admin-ayuda {
+  margin-top: 1rem;
+  max-width: 400px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-texto-secundario);
+}
+
 .admin-mensaje {
   margin-top: 1rem;
   padding: 10px 14px;

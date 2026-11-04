@@ -155,8 +155,11 @@ También se pueden correr por separado con `npm run test:concurrencia` y
   cliente elige una. No se permiten horarios libres ni duraciones arbitrarias.
 - **Sin pádel por ahora:** el `ENUM` de `canchas.tipo` solo contempla `futbol5`
   y `futbol7`. Se agrega únicamente si un cliente lo pide.
-- **`precio_nocturno`:** la columna existe pero todavía no se usa. Queda
-  reservada para una regla de precio por franja nocturna.
+- **`precio_nocturno`:** una franja que **empieza** a partir de las 20:00
+  (configurable con `HORA_NOCTURNA_INICIO`) cobra `precio_nocturno` si está
+  cargado. Si está en 0, cobra `precio_base`. El cálculo se hace siempre en el
+  backend y el cliente ve el precio final en `GET /api/franjas/:canchaId`
+  (`precio_vigente`).
 
 ## Pendientes
 
@@ -167,7 +170,7 @@ También se pueden correr por separado con `npm run test:concurrencia` y
 - [x] Ocultar el menú de admin a los clientes en el frontend.
 - [x] Test de concurrencia (`npm test`).
 - [x] Rate limiting en login y headers de seguridad (`helmet`).
-- [ ] Regla de precio nocturno (usar `precio_nocturno`).
+- [x] Regla de precio nocturno (`precio_nocturno` desde las 20:00).
 - [x] Tests de integración de la API (permisos, validaciones, concurrencia).
 - [ ] Despliegue (backend, frontend y base de datos en producción).
 

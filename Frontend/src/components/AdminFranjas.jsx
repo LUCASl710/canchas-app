@@ -102,6 +102,11 @@ function AdminFranjas() {
         </button>
       </form>
 
+      <p className="admin-ayuda">
+        Las franjas que empiezan a las 20:00 o después cobran el precio nocturno
+        si lo cargás. Si lo dejás vacío, se cobra el precio base.
+      </p>
+
       {error && <p className="admin-mensaje">{error}</p>}
       {mensaje && <p className="admin-mensaje">{mensaje}</p>}
     </div>

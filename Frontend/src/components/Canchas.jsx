@@ -98,7 +98,10 @@ function Canchas() {
           {franjas.map((franja) => (
             <div key={franja.id} className="franja-item">
               <span className="franja-info">
-                {formatearHora(franja.hora_inicio)} - {formatearHora(franja.hora_fin)} | ${franja.precio_base}
+                {formatearHora(franja.hora_inicio)} - {formatearHora(franja.hora_fin)} | ${franja.precio_vigente}
+                {franja.es_nocturna && Number(franja.precio_nocturno) > 0 && (
+                  <span className="franja-nocturna">Nocturno</span>
+                )}
               </span>
               <button className="franja-btn" onClick={() => reservar(franja)}>
                 Reservar

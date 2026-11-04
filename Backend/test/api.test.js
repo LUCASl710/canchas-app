@@ -14,6 +14,7 @@ require('dotenv').config();
 const HOST = process.env.HOST || 'localhost';
 const PORT = Number(process.env.PORT) || 3001;
 const FECHA = '2027-06-15';
+const FECHA2 = '2027-06-16';
 
 let adminToken = '';
 let clienteToken = '';
@@ -69,7 +70,7 @@ after(async () => {
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME || 'canchas_db',
   });
-  await conn.query('DELETE FROM reservas WHERE fecha = ?', [FECHA]);
+  await conn.query('DELETE FROM reservas WHERE fecha IN (?, ?)', [FECHA, FECHA2]);
   await conn.end();
 });
 
@@ -171,6 +172,50 @@ test('PATCH estado válido con admin da 200', async () => {
 test('no se puede cancelar una reserva completada', async () => {
   const r = await request('DELETE', `/api/reservas/${reservaId}`, { token: adminToken });
   assert.equal(r.status, 400);
+});
+
+test('GET /api/franjas/:id devuelve precio_vigente y marca nocturnas', async () => {
+  const r = await request('GET', '/api/franjas/1');
+  assert.equal(r.status, 200);
+
+  const nocturna = r.body.find((f) => f.hora_inicio === '20:00:00');
+  const diurna = r.body.find((f) => f.hora_inicio === '18:00:00');
+
+  assert.ok(nocturna && diurna);
+  assert.equal(nocturna.es_nocturna, true);
+  assert.equal(nocturna.precio_vigente, Number(nocturna.precio_nocturno));
+  assert.equal(diurna.es_nocturna, false);
+  assert.equal(diurna.precio_vigente, Number(diurna.precio_base));
+});
+
+test('una reserva nocturna cobra el precio nocturno', async () => {
+  const franjas = await request('GET', '/api/franjas/1');
+  const nocturna = franjas.body.find((f) => f.hora_inicio === '20:00:00');
+
+  const r = await request('POST', '/api/reservas', {
+    token: clienteToken,
+    body: { cancha_id: 1, franja_id: nocturna.id, fecha: FECHA2, metodo_pago: 'efectivo' },
+  });
+  assert.equal(r.status, 201);
+
+  const lista = await request('GET', `/api/reservas?fecha=${FECHA2}`, { token: adminToken });
+  const creada = lista.body.find((x) => x.id === r.body.id);
+  assert.equal(Number(creada.monto_total), nocturna.precio_vigente);
+});
+
+test('una reserva diurna cobra el precio base', async () => {
+  const franjas = await request('GET', '/api/franjas/1');
+  const diurna = franjas.body.find((f) => f.hora_inicio === '18:00:00');
+
+  const r = await request('POST', '/api/reservas', {
+    token: clienteToken,
+    body: { cancha_id: 1, franja_id: diurna.id, fecha: FECHA2, metodo_pago: 'efectivo' },
+  });
+  assert.equal(r.status, 201);
+
+  const lista = await request('GET', `/api/reservas?fecha=${FECHA2}`, { token: adminToken });
+  const creada = lista.body.find((x) => x.id === r.body.id);
+  assert.equal(Number(creada.monto_total), Number(diurna.precio_base));
 });
 
 test('ruta inexistente responde JSON 404', async () => {

@@ -85,6 +85,18 @@
   font-size: 14px;
 }
 
+.franja-nocturna {
+  margin-left: 8px;
+  background: #e0e7ff;
+  color: #3730a3;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
 .franja-btn {
   background: var(--color-verde-claro);
   color: var(--color-verde-texto);
