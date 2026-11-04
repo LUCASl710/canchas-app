@@ -1,0 +1,17 @@
+name: Keep Render awake
+
+# Render free duerme el backend después de 15 minutos sin tráfico.
+# Este workflow hace un GET al health check cada 10 minutos para despertarlo.
+# No necesita ninguna cuenta extra: usa GitHub Actions del propio repo.
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping /api/health
+        run: curl -fsS --max-time 120 https://canchas-api-2m2q.onrender.com/api/health

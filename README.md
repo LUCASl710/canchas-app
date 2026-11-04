@@ -3,13 +3,22 @@
 Sistema de gestión y reserva de turnos para complejos de canchas de fútbol.
 Incluye un panel de administración para el complejo y una vista pública para los clientes.
 
+## Demo
+
+- **Frontend:** <https://canchas-app-mu.vercel.app>
+- **API:** <https://canchas-api-2m2q.onrender.com>
+- **Health check:** <https://canchas-api-2m2q.onrender.com/api/health>
+
+> El backend corre en Render free: si estuvo 15 minutos sin tráfico, el primer
+> request puede tardar ~1 minuto en despertar.
+
 ## Stack
 
 | Capa | Tecnología |
 |---|---|
 | Frontend | React 19 + Vite |
 | Backend | Node.js + Express 5 |
-| Base de datos | MySQL 8 (driver `mysql2`) |
+| Base de datos | MySQL 8 / TiDB Cloud Starter (driver `mysql2`) |
 | Autenticación | JWT + bcrypt |
 | Pagos | Mercado Pago (Checkout Pro) |
 
@@ -100,10 +109,11 @@ También se pueden correr por separado con `npm run test:concurrencia` y
 
 | Rol | Email | Contraseña |
 |---|---|---|
-| Admin | `admin@canchas.com` | `Admin1234` |
-| Cliente | `cliente@test.com` | `Cliente1234` |
+| Cliente (demo) | `cliente@test.com` | `Cliente1234` |
+| Admin | `admin@canchas.com` | No publicada |
 
-> Estas credenciales son **solo para desarrollo**. Cambiarlas antes de cualquier despliegue.
+> El cliente demo está disponible en la demo pública. La contraseña del admin
+> no se publica: se configura con `npm run crear-admin` (ver [`DEPLOY.md`](DEPLOY.md)).
 
 ## Roles y permisos
 
@@ -137,7 +147,7 @@ También se pueden correr por separado con `npm run test:concurrencia` y
   `franjas_horarias`. Dos clientes no pueden reservar el mismo turno a la vez.
 - **Webhook de pagos:** no confía en el body; consulta el pago a la API de
   Mercado Pago y verifica que el monto coincida antes de confirmar.
-- **Subida de grabaciones:** solo admin, solo archivos de video, máximo 500 MB.
+- **Subida de grabaciones:** solo admin, solo archivos de video, máximo configurable con `MAX_VIDEO_MB` (500 MB por defecto, 100 MB en producción).
 - **Rate limit:** 20 intentos por IP cada 15 minutos en login y registro
   (configurable con `AUTH_RATE_LIMIT_MAX` y `AUTH_RATE_LIMIT_WINDOW_MS`).
 - **Headers de seguridad:** `helmet` (nosniff, X-Frame-Options, HSTS, etc.).
@@ -148,6 +158,8 @@ También se pueden correr por separado con `npm run test:concurrencia` y
 > ⚠️ **Mercado Pago:** el `MP_ACCESS_TOKEN` anterior quedó expuesto en texto plano.
 > Fue eliminado del `.env`. Hay que generar uno nuevo desde el panel de
 > desarrolladores de Mercado Pago antes de volver a usar Checkout Pro.
+> En la demo pública Checkout Pro está desactivado: usá **efectivo** o
+> **QR presencial** para reservar.
 
 ## Decisiones de producto
 
@@ -182,7 +194,8 @@ También se pueden correr por separado con `npm run test:concurrencia` y
 - [ ] Expirar reservas `pendiente` de pago (si el cliente no paga, el turno
   queda bloqueado hasta que se cancele a mano).
 - [x] Tests de integración de la API (permisos, validaciones, concurrencia).
-- [ ] Despliegue (backend, frontend y base de datos en producción).
+- [x] Despliegue (backend en Render, frontend en Vercel, base en TiDB Cloud).
+- [ ] Mover las grabaciones a Cloudinary/S3 (el disco de Render free es efímero).
 
 > **Webhook en desarrollo:** Mercado Pago necesita una URL pública para avisar
 > los pagos. Configurá `MP_WEBHOOK_URL` con una URL de ngrok (por ejemplo

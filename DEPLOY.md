@@ -169,6 +169,11 @@ Si falla la conexión a la base, revisá los logs de Render. Si el error es de c
 4. La URL de producción actual es <https://canchas-app-mu.vercel.app>.
    El proyecto ya está conectado al repo de GitHub, así que cada push a `main` redeploya.
 
+> La cuenta de Vercel quedó creada con el email viejo `sevenytjuegos@gmail.com`.
+> Cambiarlo requiere reautenticar con ese email. Si ya no tenés acceso, el deploy
+> sigue funcionando (el login es por GitHub), pero no vas a recibir las
+> notificaciones de Vercel. Contactá a soporte de Vercel si querés cambiarlo.
+
 ---
 
 ## 5. Conectar frontend y backend (CORS)
@@ -200,12 +205,20 @@ Después podés borrar el usuario demo `admin@canchas.com` desde el panel o con 
 
 ## 7. Mantener Render despierto (opcional pero recomendado)
 
-Render free duerme a los 15 minutos. Para que un visitante no espere ~1 minuto:
+Render free duerme a los 15 minutos. Para que un visitante no espere ~1 minuto,
+el repo ya incluye `.github/workflows/keep-alive.yml`: un workflow de GitHub
+Actions que hace un GET a `/api/health` cada 10 minutos. No necesita cuentas
+extra y se ejecuta sobre el repo público.
+
+Alternativa con cron-job.org:
 
 1. Creá una cuenta gratis en <https://cron-job.org>.
 2. Creá un cron job cada 10 minutos apuntando a:
    `https://canchas-api-2m2q.onrender.com/api/health`
 3. Listo. Consume ~730 de las 750 horas free mensuales.
+
+> GitHub Actions puede demorar unos minutos en horarios pico. Si necesitás
+> puntualidad exacta, usá cron-job.org.
 
 ---
 
@@ -225,8 +238,8 @@ Render free duerme a los 15 minutos. Para que un visitante no espere ~1 minuto:
 - [x] `https://canchas-api-2m2q.onrender.com/api/health` devuelve `{"ok":true}`.
 - [x] El frontend carga canchas y franjas.
 - [x] Login de cliente y admin funciona.
-- [ ] Se puede reservar y el turno queda ocupado (probado en local; falta prueba en producción).
-- [x] El admin ve el panel (falta probar cancelar en producción).
+- [x] Se puede reservar y el turno queda ocupado (201, duplicado 409).
+- [x] El admin ve el panel y puede cancelar (probado en producción).
 - [x] `FRONTEND_URL` en Render es exactamente la URL de Vercel.
-- [ ] La contraseña del admin demo fue cambiada.
-- [ ] (Opcional) cron-job.org mantiene el backend despierto.
+- [x] La contraseña del admin demo fue cambiada.
+- [x] Keep-alive configurado con GitHub Actions (cron-job.org es una alternativa).
