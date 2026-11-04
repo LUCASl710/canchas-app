@@ -19,6 +19,9 @@ services:
         value: production
       - key: TRUST_PROXY
         value: "1"
+      # Render corre en UTC; el complejo y los turnos son hora Argentina.
+      - key: TZ
+        value: America/Argentina/Buenos_Aires
 
       # TiDB Cloud Starter (MySQL compatible). Completar host/usuario/clave
       # con los datos del cluster.

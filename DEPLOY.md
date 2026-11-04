@@ -25,8 +25,9 @@ Stack elegido para que el proyecto quede online **sin pagar**:
 | Render | servicio `canchas-api` (`srv-dblcc0ijnfac73fjb8rg`) |
 | Vercel | proyecto `lucasl710s-projects/canchas-app`, root `Frontend` |
 
-El frontend y el backend están conectados al repo `LUCASl710/canchas-app`:
-cada push a `main` redeploya en Vercel y Render.
+El frontend se redeploya solo en Vercel con cada push a `main`.
+El backend se redeploya en Render con el workflow `.github/workflows/render-deploy.yml`
+(cuando cambia `Backend/**` o `render.yaml`), que llama al Deploy Hook del servicio.
 
 ---
 
@@ -131,6 +132,25 @@ curl.exe https://canchas-api-2m2q.onrender.com/api/health
 # {"ok":true}
 ```
 
+### Auto-deploy del backend
+
+El servicio está conectado como repositorio público, así que Render no siempre
+recibe el evento de push. Para que cada cambio en `Backend/` redeploye solo:
+
+1. En Render → `canchas-api` → **Settings** → **Deploy Hook**, copiá la URL.
+2. Guardala como secret del repo (una sola vez):
+
+```powershell
+gh secret set RENDER_DEPLOY_HOOK_URL
+# Pegá la URL cuando la pida.
+```
+
+3. El workflow `.github/workflows/render-deploy.yml` la usa en cada push a `main`
+   que toque `Backend/**`, `render.yaml` o el propio workflow.
+
+> El servicio define `TZ=America/Argentina/Buenos_Aires` para que los cálculos
+> de turnos y cancelaciones usen la hora del complejo (Render corre en UTC).
+
 Si falla la conexión a la base, revisá los logs de Render. Si el error es de certificado TLS, agregá en Render:
 
 - `DB_SSL_CA` = ruta al CA dentro del repo (por ejemplo `./certs/tidb-ca.pem`), o
@@ -202,11 +222,11 @@ Render free duerme a los 15 minutos. Para que un visitante no espere ~1 minuto:
 
 ## Checklist final
 
-- [ ] `https://canchas-api-2m2q.onrender.com/api/health` devuelve `{"ok":true}`.
-- [ ] El frontend carga canchas y franjas.
-- [ ] Login de cliente y admin funciona.
-- [ ] Se puede reservar y el turno queda ocupado.
-- [ ] El admin ve el panel y puede cancelar.
-- [ ] `FRONTEND_URL` en Render es exactamente la URL de Vercel.
+- [x] `https://canchas-api-2m2q.onrender.com/api/health` devuelve `{"ok":true}`.
+- [x] El frontend carga canchas y franjas.
+- [x] Login de cliente y admin funciona.
+- [ ] Se puede reservar y el turno queda ocupado (probado en local; falta prueba en producción).
+- [x] El admin ve el panel (falta probar cancelar en producción).
+- [x] `FRONTEND_URL` en Render es exactamente la URL de Vercel.
 - [ ] La contraseña del admin demo fue cambiada.
 - [ ] (Opcional) cron-job.org mantiene el backend despierto.
