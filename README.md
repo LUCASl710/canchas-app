@@ -109,9 +109,9 @@ Corre dos suites:
 También se pueden correr por separado con `npm run test:concurrencia` y
 `npm run test:api`. Los tests limpian las reservas que crean.
 
-En cada push a `main` que toque `Backend/` o `db/`, GitHub Actions levanta un
-MySQL 8.4, importa el schema y el seed, y corre `npm test`
-([`.github/workflows/ci.yml`](.github/workflows/ci.yml)).
+En cada push a `main` que toque `Backend/`, `Frontend/` o `db/`, GitHub Actions
+levanta un MySQL 8.4, importa el schema y el seed, corre `npm test` y buildea el
+frontend ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)).
 
 ## Usuarios de prueba
 
