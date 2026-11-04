@@ -10,6 +10,9 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
+  // Las columnas DATE llegan como "YYYY-MM-DD" (string) y no como Date,
+  // así el frontend no las corre un día por la zona horaria.
+  dateStrings: ['DATE'],
 });
 
 // Probamos la conexión al arrancar para enterarnos temprano si algo falla.

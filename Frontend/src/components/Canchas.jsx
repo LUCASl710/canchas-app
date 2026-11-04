@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { apiFetch } from '../api';
+import { fechaHoyLocal, formatearHora } from '../utils/formato';
 import './Canchas.css';
 
 function Canchas() {
@@ -60,7 +61,7 @@ function Canchas() {
     }
   };
 
-  const hoy = new Date().toISOString().split('T')[0];
+  const hoy = fechaHoyLocal();
 
   return (
     <div>
@@ -97,7 +98,7 @@ function Canchas() {
           {franjas.map((franja) => (
             <div key={franja.id} className="franja-item">
               <span className="franja-info">
-                {franja.hora_inicio} - {franja.hora_fin} | ${franja.precio_base}
+                {formatearHora(franja.hora_inicio)} - {formatearHora(franja.hora_fin)} | ${franja.precio_base}
               </span>
               <button className="franja-btn" onClick={() => reservar(franja)}>
                 Reservar

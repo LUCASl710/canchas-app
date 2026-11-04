@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { apiFetch, API_URL } from '../api';
+import { formatearFecha, formatearHora } from '../utils/formato';
 import './MisReservas.css';
 
 function MisReservas({ esAdmin = false }) {
@@ -135,8 +136,8 @@ function MisReservas({ esAdmin = false }) {
             </p>
           )}
 
-          <p className="reserva-detalle">Fecha: {new Date(reserva.fecha).toLocaleDateString('es-AR')}</p>
-          <p className="reserva-detalle">Horario: {reserva.hora_inicio} - {reserva.hora_fin}</p>
+          <p className="reserva-detalle">Fecha: {formatearFecha(reserva.fecha)}</p>
+          <p className="reserva-detalle">Horario: {formatearHora(reserva.hora_inicio)} - {formatearHora(reserva.hora_fin)}</p>
           <p className="reserva-detalle">Monto: ${reserva.monto_total}</p>
           <p className="reserva-detalle">Pago: {reserva.metodo_pago}</p>
 

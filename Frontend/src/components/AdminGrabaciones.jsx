@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { apiFetch } from '../api';
+import { formatearFecha, formatearHora } from '../utils/formato';
 import './AdminCanchas.css';
 
 function AdminGrabaciones() {
@@ -79,7 +80,7 @@ function AdminGrabaciones() {
           </option>
           {reservasDisponibles.map((r) => (
             <option key={r.id} value={r.id}>
-              #{r.id} — {r.cancha_nombre} — {new Date(r.fecha).toLocaleDateString('es-AR')} {r.hora_inicio} ({r.nombre} {r.apellido})
+              #{r.id} — {r.cancha_nombre} — {formatearFecha(r.fecha)} {formatearHora(r.hora_inicio)} ({r.nombre} {r.apellido})
             </option>
           ))}
         </select>
