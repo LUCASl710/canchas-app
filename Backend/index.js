@@ -2,9 +2,18 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-const path = require('path');
+const pool = require('./src/db/connection');
+const uploadsDir = require('./src/config/uploads');
 
 const app = express();
+
+app.disable('x-powered-by');
+
+// Detrás de un proxy (Railway, Render, Nginx) hay que confiar en el primer
+// salto para que req.ip sea la IP real del cliente y no la del proxy.
+if (process.env.TRUST_PROXY === '1' || process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
 
 // Headers de seguridad. cross-origin para que el frontend pueda embeber
 // los videos servidos desde /uploads.
@@ -22,11 +31,31 @@ const pagosRouter = require('./src/routes/pagos');
 
 const PORT = process.env.PORT || 3001;
 
-app.use(express.json());
-app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5173' }));
+// Uno o varios orígenes separados por coma (prod + previews de Vercel).
+const origenesPermitidos = (process.env.FRONTEND_URL || 'http://localhost:5173')
+  .split(',')
+  .map((origen) => origen.trim())
+  .filter(Boolean);
 
-// Videos subidos por el admin.
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use(express.json());
+app.use(cors({
+  origin: (origin, callback) => {
+    // Sin Origin (curl, health checks, server-to-server) se permite.
+    callback(null, !origin || origenesPermitidos.includes(origin));
+  },
+}));
+
+// Videos subidos por el admin (UPLOADS_DIR permite usar un volumen).
+app.use('/uploads', express.static(uploadsDir));
+
+app.get('/api/health', async (req, res) => {
+  try {
+    await pool.query('SELECT 1');
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(503).json({ ok: false, error: 'Base de datos no disponible' });
+  }
+});
 app.use('/api/usuarios', usuariosRouter);
 app.use('/api/canchas', canchasRouter);
 app.use('/api/franjas', franjasRouter);
@@ -62,6 +91,20 @@ app.use((err, req, res, next) => {
   res.status(err.status || err.statusCode || 500).json({ error: 'Error en el servidor' });
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
+
+// Cierre ordenado: la plataforma manda SIGTERM al reiniciar o hacer deploy.
+function cerrar(senal) {
+  console.log(`${senal} recibida, cerrando servidor...`);
+  server.close(async () => {
+    await pool.end();
+    process.exit(0);
+  });
+  // Si alguna conexión queda colgada, no esperamos para siempre.
+  setTimeout(() => process.exit(1), 10000).unref();
+}
+
+process.on('SIGTERM', () => cerrar('SIGTERM'));
+process.on('SIGINT', () => cerrar('SIGINT'));

@@ -1,15 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
-const fs = require('fs');
 const multer = require('multer');
 const query = require('../db/query');
 const authMiddleware = require('../middleware/auth');
 const { soloAdmin } = require('../middleware/roles');
-
-// Los videos se guardan en Backend/uploads (ya está en .gitignore).
-const uploadsDir = path.join(__dirname, '..', '..', 'uploads');
-fs.mkdirSync(uploadsDir, { recursive: true });
+const uploadsDir = require('../config/uploads');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadsDir),
