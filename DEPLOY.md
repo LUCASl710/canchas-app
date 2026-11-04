@@ -232,8 +232,9 @@ el script.
 
 Render free duerme a los 15 minutos. Para que un visitante no espere ~1 minuto,
 el repo ya incluye `.github/workflows/keep-alive.yml`: un workflow de GitHub
-Actions que hace un GET a `/api/health` cada 10 minutos. No necesita cuentas
-extra y se ejecuta sobre el repo público.
+Actions que hace un GET a `/api/health` cada 5 minutos (se usa 5 y no 10 para
+tener margen si GitHub demora la ejecución). No necesita cuentas extra y se
+ejecuta sobre el repo público.
 
 Alternativa con cron-job.org:
 

@@ -1,12 +1,13 @@
 name: Keep Render awake
 
 # Render free duerme el backend después de 15 minutos sin tráfico.
-# Este workflow hace un GET al health check cada 10 minutos para despertarlo.
+# Este workflow hace un GET al health check cada 5 minutos para despertarlo.
+# Se usa 5 y no 10 para tener margen si GitHub demora la ejecución programada.
 # No necesita ninguna cuenta extra: usa GitHub Actions del propio repo.
 
 on:
   schedule:
-    - cron: '*/10 * * * *'
+    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 jobs:
