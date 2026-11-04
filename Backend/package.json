@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "node --watch index.js",
     "start": "node index.js",
-    "test": "node test/concurrencia.js"
+    "test": "npm run test:concurrencia && npm run test:api",
+    "test:concurrencia": "node test/concurrencia.js",
+    "test:api": "node --test test/api.test.js"
   },
   "keywords": [],
   "author": "",

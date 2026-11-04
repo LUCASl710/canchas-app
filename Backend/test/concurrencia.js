@@ -5,6 +5,8 @@
 // Requiere el backend corriendo en http://localhost:3001
 
 const http = require('http');
+const mysql = require('mysql2/promise');
+require('dotenv').config();
 
 const HOST = process.env.HOST || 'localhost';
 const PORT = Number(process.env.PORT) || 3001;
@@ -65,11 +67,16 @@ async function main() {
 
   console.log('Respuestas:', resultados.map((r) => `${r.status} ${JSON.stringify(r.body)}`).join(' | '));
 
-  // Limpieza: si una entró, la cancelamos para poder repetir la prueba.
-  const creada = resultados.find((r) => r.status === 201);
-  if (creada) {
-    await request('DELETE', `/api/reservas/${creada.body.id}`, { token: tokenA });
-  }
+  // Limpieza: borramos las reservas de prueba para poder repetir la prueba
+  // sin dejar filas en la base.
+  const conn = await mysql.createConnection({
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'canchas_db',
+  });
+  await conn.query('DELETE FROM reservas WHERE fecha = ?', [body.fecha]);
+  await conn.end();
 
   if (ok) {
     console.log('OK: una reserva entró y la otra fue rechazada (409).');

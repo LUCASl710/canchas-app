@@ -76,17 +76,25 @@ npm run dev
 
 App en `http://localhost:5173`.
 
-## Prueba de concurrencia
+## Tests
 
-Con el backend corriendo:
+Con el backend corriendo y MySQL arriba:
 
 ```bash
 cd Backend
 npm test
 ```
 
-Dispara **dos reservas simultáneas al mismo turno**. El resultado correcto es
-una `201` (entró) y una `409` (rechazada). Si las dos entran, el lock está mal.
+Corre dos suites:
+
+- **Concurrencia** (`test/concurrencia.js`): dispara dos reservas simultáneas
+  al mismo turno. El resultado correcto es una `201` y una `409`.
+- **API** (`test/api.test.js`): 17 tests de integración contra HTTP real
+  (permisos, validaciones, doble reserva, cambios de estado, 404 y JSON
+  malformado).
+
+También se pueden correr por separado con `npm run test:concurrencia` y
+`npm run test:api`. Los tests limpian las reservas que crean.
 
 ## Usuarios de prueba
 
@@ -160,7 +168,7 @@ una `201` (entró) y una `409` (rechazada). Si las dos entran, el lock está mal
 - [x] Test de concurrencia (`npm test`).
 - [x] Rate limiting en login y headers de seguridad (`helmet`).
 - [ ] Regla de precio nocturno (usar `precio_nocturno`).
-- [ ] Tests unitarios y de integración completos.
+- [x] Tests de integración de la API (permisos, validaciones, concurrencia).
 - [ ] Despliegue (backend, frontend y base de datos en producción).
 
 > **Webhook en desarrollo:** Mercado Pago necesita una URL pública para avisar
