@@ -1,22 +1,29 @@
 name: CI
 
-# Corre los tests del backend contra un MySQL real en cada push que toque
-# Backend/, db/ o este workflow. También corre en los pull requests.
+# Corre los tests del backend contra un MySQL real y buildea el frontend
+# en cada push que toque Backend/, Frontend/, db/ o este workflow.
+# También corre en los pull requests.
 
 on:
   push:
     branches: [main]
     paths:
       - 'Backend/**'
+      - 'Frontend/**'
       - 'db/**'
       - '.github/workflows/ci.yml'
   pull_request:
     branches: [main]
   workflow_dispatch:
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     services:
       mysql:
@@ -54,7 +61,7 @@ jobs:
       - name: Configurar Node
         uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
           cache-dependency-path: Backend/package-lock.json
 
@@ -97,3 +104,31 @@ jobs:
           fi
 
           exit $TEST_EXIT
+
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      VITE_API_URL: https://canchas-api-2m2q.onrender.com
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Configurar Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: Frontend/package-lock.json
+
+      - name: Instalar dependencias
+        working-directory: Frontend
+        run: npm ci
+
+      - name: Lint
+        working-directory: Frontend
+        run: npm run lint
+
+      - name: Build
+        working-directory: Frontend
+        run: npm run build

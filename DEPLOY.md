@@ -244,7 +244,9 @@ Alternativa con cron-job.org:
 3. Listo. Consume ~730 de las 750 horas free mensuales.
 
 > GitHub Actions puede demorar unos minutos en horarios pico. Si necesitás
-> puntualidad exacta, usá cron-job.org.
+> puntualidad exacta, usá cron-job.org. La primera ejecución programada puede
+> tardar hasta ~1 hora en registrarse después de agregar el workflow; si no
+> aparece, pasá a cron-job.org.
 >
 > GitHub también desactiva los workflows programados después de 60 días sin
 > actividad en el repo. Si no vas a hacer push por un tiempo, usá cron-job.org
