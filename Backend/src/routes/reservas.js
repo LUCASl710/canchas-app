@@ -7,6 +7,7 @@ const { soloAdmin } = require('../middleware/roles');
 const { Preference } = require('mercadopago');
 const mp = require('../config/mercadopago');
 const { calcularMonto } = require('../utils/precios');
+const { puedeCancelar, horasHasta, HORAS_CANCELACION_MINIMAS } = require('../utils/cancelacion');
 
 // GET /api/reservas
 // Admin: ve todas las reservas. Cliente: ve SOLO las suyas.
@@ -48,7 +49,17 @@ router.get('/', authMiddleware, async (req, res) => {
     sql += ' ORDER BY r.fecha DESC, f.hora_inicio ASC';
 
     const resultados = await query(sql, params);
-    res.json(resultados);
+
+    // El frontend usa esto para no mostrar un botón de cancelar que va a fallar.
+    const conPermiso = resultados.map((reserva) => ({
+      ...reserva,
+      puede_cancelar:
+        reserva.estado !== 'completada' &&
+        reserva.estado !== 'cancelada' &&
+        (esAdmin || puedeCancelar(reserva.fecha, reserva.hora_inicio)),
+    }));
+
+    res.json(conPermiso);
   } catch (err) {
     res.status(500).json({ error: 'Error al obtener reservas' });
   }
@@ -69,6 +80,10 @@ router.post('/', authMiddleware, async (req, res) => {
 
   if (!cancha_id || !franja_id || !fecha || !metodo_pago) {
     return res.status(400).json({ error: 'Faltan datos obligatorios' });
+  }
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
+    return res.status(400).json({ error: 'Fecha inválida' });
   }
 
   if (!['efectivo', 'mercadopago', 'qr_presencial'].includes(metodo_pago)) {
@@ -97,6 +112,12 @@ router.post('/', authMiddleware, async (req, res) => {
     if (pasado[0].esPasado) {
       await conn.rollback();
       return res.status(400).json({ error: 'No podés reservar una fecha pasada' });
+    }
+
+    // Tampoco un turno de hoy que ya empezó.
+    if (horasHasta(fecha, franjas[0].hora_inicio) < 0) {
+      await conn.rollback();
+      return res.status(400).json({ error: 'Ese turno ya empezó' });
     }
 
     // 3. Disponibilidad. Ya tenemos el lock, nadie más puede estar acá.
@@ -216,7 +237,13 @@ router.delete('/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
 
   try {
-    const reservas = await query('SELECT usuario_id, estado FROM reservas WHERE id = ?', [id]);
+    const reservas = await query(
+      `SELECT r.usuario_id, r.estado, r.fecha, f.hora_inicio
+       FROM reservas r
+       JOIN franjas_horarias f ON f.id = r.franja_id
+       WHERE r.id = ?`,
+      [id]
+    );
 
     if (reservas.length === 0) {
       return res.status(404).json({ error: 'Reserva no encontrada' });
@@ -232,6 +259,17 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 
     if (reserva.estado === 'completada') {
       return res.status(400).json({ error: 'No se puede cancelar una reserva completada' });
+    }
+
+    if (reserva.estado === 'cancelada') {
+      return res.status(400).json({ error: 'La reserva ya está cancelada' });
+    }
+
+    // El admin puede cancelar siempre; el cliente solo hasta N horas antes.
+    if (!esAdmin && !puedeCancelar(reserva.fecha, reserva.hora_inicio)) {
+      return res.status(400).json({
+        error: `Solo se puede cancelar hasta ${HORAS_CANCELACION_MINIMAS} horas antes del turno`,
+      });
     }
 
     await query("UPDATE reservas SET estado = 'cancelada' WHERE id = ?", [id]);

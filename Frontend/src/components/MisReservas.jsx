@@ -154,7 +154,7 @@ function MisReservas({ esAdmin = false }) {
               </button>
             )}
 
-            {reserva.estado !== 'cancelada' && reserva.estado !== 'completada' && (
+            {reserva.puede_cancelar && (
               <button className="reserva-btn-cancelar" onClick={() => cancelarReserva(reserva.id)}>
                 Cancelar
               </button>
@@ -166,6 +166,10 @@ function MisReservas({ esAdmin = false }) {
               </button>
             )}
           </div>
+
+          {!esAdmin && reserva.estado !== 'cancelada' && reserva.estado !== 'completada' && !reserva.puede_cancelar && (
+            <p className="reserva-aviso">La cancelación ya está cerrada para este turno.</p>
+          )}
         </div>
       ))}
 

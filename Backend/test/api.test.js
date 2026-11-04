@@ -18,6 +18,7 @@ const FECHA2 = '2027-06-16';
 
 let adminToken = '';
 let clienteToken = '';
+let clienteId = null;
 let reservaId = null;
 
 function request(method, path, { token, body, raw } = {}) {
@@ -54,22 +55,58 @@ function request(method, path, { token, body, raw } = {}) {
 async function login(email, password) {
   const res = await request('POST', '/api/auth/login', { body: { email, password } });
   assert.equal(res.status, 200, `login de ${email} debería ser 200`);
-  return res.body.token;
+  return res.body;
 }
 
-before(async () => {
-  adminToken = await login('admin@canchas.com', 'Admin1234');
-  clienteToken = await login('cliente@test.com', 'Cliente1234');
-});
-
-after(async () => {
-  // Limpia las reservas de prueba para no ensuciar la base.
-  const conn = await mysql.createConnection({
+function dbConnection() {
+  return mysql.createConnection({
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME || 'canchas_db',
   });
+}
+
+// Inserta directo en la base un turno para hoy. Se usa para probar la regla de
+// cancelación sin depender de la hora a la que se corran los tests.
+async function insertarReservaDeHoy(usuarioId) {
+  const conn = await dbConnection();
+  try {
+    const [franjas] = await conn.query(
+      'SELECT id FROM franjas_horarias WHERE cancha_id = 1 ORDER BY hora_inicio LIMIT 1'
+    );
+    const [ins] = await conn.query(
+      `INSERT INTO reservas (usuario_id, cancha_id, franja_id, fecha, monto_total, metodo_pago, estado)
+       VALUES (?, 1, ?, CURDATE(), 1000, 'efectivo', 'confirmada')`,
+      [usuarioId, franjas[0].id]
+    );
+    return ins.insertId;
+  } finally {
+    await conn.end();
+  }
+}
+
+async function borrarReserva(id) {
+  const conn = await dbConnection();
+  try {
+    await conn.query('DELETE FROM reservas WHERE id = ?', [id]);
+  } finally {
+    await conn.end();
+  }
+}
+
+before(async () => {
+  const admin = await login('admin@canchas.com', 'Admin1234');
+  adminToken = admin.token;
+
+  const cliente = await login('cliente@test.com', 'Cliente1234');
+  clienteToken = cliente.token;
+  clienteId = cliente.usuario.id;
+});
+
+after(async () => {
+  // Limpia las reservas de prueba para no ensuciar la base.
+  const conn = await dbConnection();
   await conn.query('DELETE FROM reservas WHERE fecha IN (?, ?)', [FECHA, FECHA2]);
   await conn.end();
 });
@@ -145,6 +182,12 @@ test('POST /api/reservas al mismo turno da 409', async () => {
   assert.equal(r.status, 409);
 });
 
+test('una reserva lejana se puede cancelar (puede_cancelar)', async () => {
+  const lista = await request('GET', `/api/reservas?fecha=${FECHA}`, { token: clienteToken });
+  const creada = lista.body.find((x) => x.id === reservaId);
+  assert.equal(creada.puede_cancelar, true);
+});
+
 test('PATCH estado con cliente da 403', async () => {
   const r = await request('PATCH', `/api/reservas/${reservaId}/estado`, {
     token: clienteToken,
@@ -172,6 +215,33 @@ test('PATCH estado válido con admin da 200', async () => {
 test('no se puede cancelar una reserva completada', async () => {
   const r = await request('DELETE', `/api/reservas/${reservaId}`, { token: adminToken });
   assert.equal(r.status, 400);
+
+  const lista = await request('GET', `/api/reservas?fecha=${FECHA}`, { token: clienteToken });
+  const creada = lista.body.find((x) => x.id === reservaId);
+  assert.equal(creada.puede_cancelar, false);
+});
+
+test('el cliente no puede cancelar con menos de 24 h', async () => {
+  const id = await insertarReservaDeHoy(clienteId);
+
+  try {
+    const r = await request('DELETE', `/api/reservas/${id}`, { token: clienteToken });
+    assert.equal(r.status, 400);
+    assert.match(r.body.error, /cancelar hasta/);
+  } finally {
+    await borrarReserva(id);
+  }
+});
+
+test('el admin puede cancelar con menos de 24 h', async () => {
+  const id = await insertarReservaDeHoy(clienteId);
+
+  try {
+    const r = await request('DELETE', `/api/reservas/${id}`, { token: adminToken });
+    assert.equal(r.status, 200);
+  } finally {
+    await borrarReserva(id);
+  }
 });
 
 test('GET /api/franjas/:id devuelve precio_vigente y marca nocturnas', async () => {

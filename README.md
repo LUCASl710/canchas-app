@@ -112,7 +112,7 @@ También se pueden correr por separado con `npm run test:concurrencia` y
 | Ver canchas y horarios | ✅ | ✅ |
 | Crear reserva | ✅ | ✅ |
 | Ver reservas | Solo las propias | Todas |
-| Cancelar reserva | Solo las propias | Todas |
+| Cancelar reserva | Solo las propias, hasta 24 h antes | Todas |
 | Ver grabaciones | Solo las de sus reservas | Todas |
 | Crear canchas / franjas | ❌ | ✅ |
 | Listar usuarios | ❌ | ✅ |
@@ -160,6 +160,12 @@ También se pueden correr por separado con `npm run test:concurrencia` y
   cargado. Si está en 0, cobra `precio_base`. El cálculo se hace siempre en el
   backend y el cliente ve el precio final en `GET /api/franjas/:canchaId`
   (`precio_vigente`).
+- **Cancelación:** el cliente puede cancelar hasta 24 h antes del inicio del
+  turno (`HORAS_CANCELACION_MINIMAS`). El admin puede cancelar siempre. La
+  reserva no se borra: pasa a `cancelada` y libera el turno. El listado incluye
+  `puede_cancelar` para que la UI no muestre un botón que va a fallar.
+- **Turnos que ya empezaron:** no se pueden reservar (se compara fecha + hora,
+  no solo la fecha).
 
 ## Pendientes
 
@@ -171,6 +177,10 @@ También se pueden correr por separado con `npm run test:concurrencia` y
 - [x] Test de concurrencia (`npm test`).
 - [x] Rate limiting en login y headers de seguridad (`helmet`).
 - [x] Regla de precio nocturno (`precio_nocturno` desde las 20:00).
+- [x] Regla de cancelación (24 h antes para el cliente).
+- [ ] Reembolso automático en Mercado Pago al cancelar una reserva paga.
+- [ ] Expirar reservas `pendiente` de pago (si el cliente no paga, el turno
+  queda bloqueado hasta que se cancele a mano).
 - [x] Tests de integración de la API (permisos, validaciones, concurrencia).
 - [ ] Despliegue (backend, frontend y base de datos en producción).
 
