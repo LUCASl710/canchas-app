@@ -187,3 +187,8 @@ También se pueden correr por separado con `npm run test:concurrencia` y
 > **Webhook en desarrollo:** Mercado Pago necesita una URL pública para avisar
 > los pagos. Configurá `MP_WEBHOOK_URL` con una URL de ngrok (por ejemplo
 > `https://xxxx.ngrok-free.app/api/pagos/webhook`) y reiniciá el backend.
+
+## Deploy
+
+El paso a paso para publicarlo gratis (Render + TiDB Cloud + Vercel) está en
+[`DEPLOY.md`](DEPLOY.md).

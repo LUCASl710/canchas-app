@@ -15,9 +15,13 @@ const storage = multer.diskStorage({
   },
 });
 
+// En producción conviene bajarlo (Render free corta requests largos y el
+// disco es efímero). Se configura por entorno sin tocar el código.
+const maxVideoMb = Number(process.env.MAX_VIDEO_MB) || 500;
+
 const upload = multer({
   storage,
-  limits: { fileSize: 500 * 1024 * 1024 }, // 500 MB
+  limits: { fileSize: maxVideoMb * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     if (!file.mimetype.startsWith('video/')) {
       return cb(new Error('El archivo debe ser un video'));
@@ -30,6 +34,9 @@ const upload = multer({
 const subirVideo = (req, res, next) => {
   upload.single('archivo')(req, res, (err) => {
     if (err) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ error: `El video supera el límite de ${maxVideoMb} MB` });
+      }
       return res.status(400).json({ error: err.message });
     }
     next();

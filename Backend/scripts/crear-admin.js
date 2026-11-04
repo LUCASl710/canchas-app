@@ -5,7 +5,9 @@
 //   2. npm run crear-admin
 //
 // En producción sirve para no dejar la contraseña demo del seed.
-require('dotenv').config();
+// DOTENV_CONFIG_PATH permite usar un archivo aparte (ej. .env.production)
+// sin pisar el .env local.
+require('dotenv').config({ path: process.env.DOTENV_CONFIG_PATH || '.env' });
 const bcrypt = require('bcryptjs');
 const query = require('../src/db/query');
 const pool = require('../src/db/connection');
