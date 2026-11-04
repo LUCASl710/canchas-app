@@ -30,7 +30,8 @@ canchas-app/
 │       │   └── query.js         # Helper de consultas con async/await
 │       ├── middleware/
 │       │   ├── auth.js          # Verifica el JWT
-│       │   └── roles.js         # Autorización por rol (soloAdmin)
+│       │   ├── roles.js         # Autorización por rol (soloAdmin)
+│       │   └── rateLimit.js     # Límite de intentos en login/registro
 │       └── routes/              # auth, usuarios, canchas, franjas, reservas, grabaciones, pagos
 ├── Frontend/
 │   ├── .env.example             # VITE_API_URL (URL del backend)
@@ -129,6 +130,11 @@ una `201` (entró) y una `409` (rechazada). Si las dos entran, el lock está mal
 - **Webhook de pagos:** no confía en el body; consulta el pago a la API de
   Mercado Pago y verifica que el monto coincida antes de confirmar.
 - **Subida de grabaciones:** solo admin, solo archivos de video, máximo 500 MB.
+- **Rate limit:** 20 intentos por IP cada 15 minutos en login y registro
+  (configurable con `AUTH_RATE_LIMIT_MAX` y `AUTH_RATE_LIMIT_WINDOW_MS`).
+- **Headers de seguridad:** `helmet` (nosniff, X-Frame-Options, HSTS, etc.).
+- **Validación de datos:** email con formato válido y contraseña de al menos
+  8 caracteres en el registro; los errores siempre responden JSON.
 - Dependencias auditadas: `npm audit` sin vulnerabilidades.
 
 > ⚠️ **Mercado Pago:** el `MP_ACCESS_TOKEN` anterior quedó expuesto en texto plano.
@@ -152,6 +158,7 @@ una `201` (entró) y una `409` (rechazada). Si las dos entran, el lock está mal
 - [x] Carga de grabaciones por parte del admin.
 - [x] Ocultar el menú de admin a los clientes en el frontend.
 - [x] Test de concurrencia (`npm test`).
+- [x] Rate limiting en login y headers de seguridad (`helmet`).
 - [ ] Regla de precio nocturno (usar `precio_nocturno`).
 - [ ] Tests unitarios y de integración completos.
 - [ ] Despliegue (backend, frontend y base de datos en producción).

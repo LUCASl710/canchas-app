@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { apiFetch } from '../api';
+import { apiFetch, API_URL } from '../api';
 import './MisReservas.css';
 
 function MisReservas({ esAdmin = false }) {
@@ -172,11 +172,11 @@ function MisReservas({ esAdmin = false }) {
         <div className="grabacion-modal">
           <div className="grabacion-modal-contenido">
             <h3 className="grabacion-titulo">{grabacionAbierta.titulo}</h3>
-            <iframe
+            <video
               className="grabacion-video"
-              src={grabacionAbierta.archivo_url}
-              title={grabacionAbierta.titulo}
-              allowFullScreen
+              src={`${API_URL}${grabacionAbierta.archivo_url}`}
+              controls
+              playsInline
             />
             <button className="grabacion-cerrar" onClick={() => setGrabacionAbierta(null)}>
               Cerrar

@@ -188,6 +188,8 @@
   aspect-ratio: 16 / 9;
   border: none;
   border-radius: 10px;
+  background: #000;
+  object-fit: contain;
 }
 
 .grabacion-cerrar {
