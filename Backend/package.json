@@ -9,7 +9,8 @@
     "test": "npm run test:concurrencia && npm run test:api",
     "test:concurrencia": "node test/concurrencia.js",
     "test:api": "node --test test/api.test.js",
-    "crear-admin": "node scripts/crear-admin.js"
+    "crear-admin": "node scripts/crear-admin.js",
+    "db:import": "node scripts/db-import.js"
   },
   "engines": {
     "node": ">=20"
