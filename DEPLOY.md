@@ -243,10 +243,10 @@ Alternativa con cron-job.org:
    `https://canchas-api-2m2q.onrender.com/api/health`
 3. Listo. Consume ~730 de las 750 horas free mensuales.
 
-> GitHub Actions puede demorar unos minutos en horarios pico. Si necesitás
-> puntualidad exacta, usá cron-job.org. La primera ejecución programada puede
-> tardar hasta ~1 hora en registrarse después de agregar el workflow; si no
-> aparece, pasá a cron-job.org.
+> **Ojo:** GitHub Actions no garantiza el cron. En la práctica, un schedule
+> cada 5 minutos puede ejecutarse cada varias horas o saltear ejecuciones.
+> Si querés que Render no duerma, usá cron-job.org: es la opción confiable.
+> El workflow de GitHub queda como respaldo.
 >
 > GitHub también desactiva los workflows programados después de 60 días sin
 > actividad en el repo. Si no vas a hacer push por un tiempo, usá cron-job.org
