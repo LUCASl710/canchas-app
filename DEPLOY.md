@@ -228,29 +228,23 @@ el script.
 
 ---
 
-## 7. Mantener Render despierto (opcional pero recomendado)
+## 7. Mantener Render despierto
 
-Render free duerme a los 15 minutos. Para que un visitante no espere ~1 minuto,
-el repo ya incluye `.github/workflows/keep-alive.yml`: un workflow de GitHub
-Actions que hace un GET a `/api/health` cada 5 minutos (se usa 5 y no 10 para
-tener margen si GitHub demora la ejecución). No necesita cuentas extra y se
-ejecuta sobre el repo público.
+Render free duerme a los 15 minutos. El keep-alive principal es un cron job
+externo en <https://cron-job.org> que hace un GET a `/api/health` cada 5
+minutos:
 
-Alternativa con cron-job.org:
+`https://canchas-api-2m2q.onrender.com/api/health`
 
-1. Creá una cuenta gratis en <https://cron-job.org>.
-2. Creá un cron job cada 10 minutos apuntando a:
-   `https://canchas-api-2m2q.onrender.com/api/health`
-3. Listo. Consume ~730 de las 750 horas free mensuales.
+El job ya está creado y habilitado. La cuenta de cron-job.org se administra por
+fuera del repo: no guardes sus credenciales acá. Consume ~730 de las 750 horas
+free mensuales.
 
-> **Ojo:** GitHub Actions no garantiza el cron. En la práctica, un schedule
-> cada 5 minutos puede ejecutarse cada varias horas o saltear ejecuciones.
-> Si querés que Render no duerma, usá cron-job.org: es la opción confiable.
-> El workflow de GitHub queda como respaldo.
->
-> GitHub también desactiva los workflows programados después de 60 días sin
-> actividad en el repo. Si no vas a hacer push por un tiempo, usá cron-job.org
-> o reactivá el workflow desde la pestaña **Actions**.
+El repo también incluye `.github/workflows/keep-alive.yml` como respaldo.
+GitHub Actions no garantiza el cron: en la práctica puede demorar horas o
+saltear ejecuciones, y desactiva los workflows programados después de 60 días
+sin actividad en el repo. Si el cron externo falla, revisá el historial del job
+en cron-job.org; el workflow de GitHub es solo un extra.
 
 ---
 
@@ -274,4 +268,4 @@ Alternativa con cron-job.org:
 - [x] El admin ve el panel y puede cancelar (probado en producción).
 - [x] `FRONTEND_URL` en Render es exactamente la URL de Vercel.
 - [x] La contraseña del admin demo fue cambiada.
-- [x] Keep-alive configurado con GitHub Actions (cron-job.org es una alternativa).
+- [x] Keep-alive configurado con cron-job.org cada 5 minutos (GitHub Actions queda como respaldo).
